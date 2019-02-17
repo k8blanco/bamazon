@@ -1,0 +1,30 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "An amazon-esque storefront created with MySQL",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/k8blanco/bamazon.git"
+  },
+  "keywords": [
+    "amazon",
+    "storefront",
+    "customer",
+    "MySQL",
+    "node"
+  ],
+  "author": "k8blanco",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/k8blanco/bamazon/issues"
+  },
+  "homepage": "https://github.com/k8blanco/bamazon#readme",
+  "dependencies": {
+    "inquirer": "^6.2.2",
+    "mysql": "^2.16.0"
+  }
+}
