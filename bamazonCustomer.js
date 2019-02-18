@@ -1,22 +1,15 @@
 //JS for Bamazon Node/MySQL App
 
 
-
-//once customer has placed order, check if "store" has enough of that product
-    //if not, display insufficient quantity and prevent the sale from going through
-        //ask if they would like to lower the quantity of the product
-        //ask if they would like to buy something else?
-//if store has sufficient quantity, fulfill the customer's order
-//once the update has gone through, show the customer the total $ of their purchase
-
-
 const inquirer = require("inquirer");
 const mysql = require("mysql");
 const Table = require("cli-table");
 const colors = require("colors");
 
+//set canBuy to true as default
+let canBuy = true;
 
-//user enters bamazonCustomer.js in node command line
+
 
 //create connection to mysql database
 const connection = mysql.createConnection({
@@ -29,7 +22,7 @@ const connection = mysql.createConnection({
   user: "root",
 
   // Your password
-  password: "****", //DO NOT GIT PUSH WITH THIS
+  password: "", //DO NOT GIT PUSH WITH THIS
   database: "bamazon"
 });
 
@@ -41,7 +34,8 @@ connection.connect(function(err) {
 
 //bamazon starts up, displays current products, depts, and prices
 function initBamazon() {
-    connection.query("SELECT * FROM products", function(err, res) {
+    let query = ("SELECT * FROM products")
+    connection.query(query, function(err, res) {
         if (err) throw err;
         //create product table using cli-table
         let table = new Table({
@@ -64,44 +58,101 @@ function initBamazon() {
         
         //display table
         console.log(table.toString());
-    })
-
-};
+        askCust();
+    });
+}
 
 //prompts user to choose what they would like to buy
-    //asks the user of the id of the item they would like to buy
-    //then asks how many of the product they would like to buy
 function askCust() {
     inquirer.prompt([
         {
-            name: "action",
+            name: "id",
             type: "input",
-            message: "Enter the ID of the product you would like to purchase",
+            message: "What catches your eye? Enter the ID # of the product you would like to purchase.",
+            validate: function(value) {
+                if (isNaN(value) === false) {
+                  return true;
+                }
+                return false;
+              }
         },
         {
             name: "qty",
             type: "input",
-            message: "How many would you like to purchase?"
+            message: "How many would you like to purchase?",
+            validate: function(value) {
+                if (isNaN(value) === false) {
+                  return true;
+                }
+                return false;
+              }
         }
     ])
+        .then(function(bamazon) {
+            //set input as variables, pass variables as params
+                //!!experiment with using let vs const here once working!!
+            var productChoice = bamazon.id;
+            var qtyWanted = bamazon.qty;
 
-        .then(function(variablehere) {
+            buyItem(productChoice, qtyWanted);
 
         })
 }
 
 
-// function runBamazon() {
-//     inquirer
-//       .prompt({
-//         name: "action",
-//         type: "input",
-//         message: "Enter the ID of the product you want to purchase",
-//       })
-//       .then(function(answer) {
-//         switch (answer.action) {
+function buyItem(itemID, qtyNeeded) {
+    //once customer has placed order, check if "store" has enough of that product
+    let query = ('SELECT * FROM products WHERE item_id = ?');
+    connection.query(query, [itemID], function(err,res) {
+        if (err) throw err;
 
-//         case "Find songs by artist":
-//           artistSearch();
-//           break;
+                //make product name plural (or not) as needed
+                let endingString = "";
+                if (qtyNeeded > 1) {
+                    endingString = "s.";
+                } else {
+                    endingString = ".";
+                };
+    
+        //if store has sufficient quantity, fulfill the customer's order
+        if (qtyNeeded <= res[0].stock_quantity) {
+            //calculate total so far
+            let purchasePrice = res[0].price * qtyNeeded;
+
+            //display total so far
+            console.log("\nGreat! You want " + qtyNeeded + " " + res[0].product_name + endingString + "\nYour total cost is $" + purchasePrice);
+            //ask if they want to add more to their cart??
+
+            //update db after purchase
+            let query = ("UPDATE bamazon.products SET stock_quantity = stock_quantity - ? WHERE item_id = ?");
+            connection.query(query, [qtyNeeded, itemID]); //can add in product sales to product sales column here
+        } else {
+            console.log("Out of Stock".red);
+        };
+        //ask if they want to make another purchase
+        buyMore();
+    }); 
+};
+
+
+function buyMore() {
+    inquirer.prompt([
+        {
+            name: "confirm",
+            type: "confirm",
+            message: "Would you like to purchase something else?",
+        },
+    ]).then(function(inquirerResponse) {
+        if (inquirerResponse.confirm) {
+            initBamazon();
+        } else {
+            console.log("\nThank you for shopping Bamazon!  Please come back soon.".green);
+            connection.end();
+        }
+    });
+};
+
+
+
+
 
