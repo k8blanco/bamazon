@@ -1,26 +1,31 @@
 //JS for Bamazon Node/MySQL Manager App
 
+
 //packages needed
+require("dotenv").config();
+
 const inquirer = require("inquirer");
 const mysql = require("mysql");
 const Table = require("cli-table");
 const colors = require("colors");
 
+
 //create connection to mysql database
 const connection = mysql.createConnection({
-    host: "localhost",
+    //Your host
+    host: process.env.DB_HOST,
   
     // Your port; if not 3306
     port: 3306,
   
     // Your username
-    user: "",
+    user: process.env.DB_USER,
   
     // Your password
-    password: "", //DO NOT GIT PUSH WITH THIS
-    database: "bamazon"
-    //create a dotenv package to hide password
-    //create new user for these??
+    password: process.env.DB_PASS, 
+
+    database: process.env.DB
+
   });
   
   connection.connect(function(err) {

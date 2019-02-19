@@ -1,5 +1,6 @@
 //JS for Bamazon Node/MySQL Customer App
 
+require("dotenv").config();
 
 const inquirer = require("inquirer");
 const mysql = require("mysql");
@@ -9,19 +10,20 @@ const colors = require("colors");
 
 //create connection to mysql database
 const connection = mysql.createConnection({
-  host: "localhost",
+    //Your host
+    host: process.env.DB_HOST,
+  
+    // Your port; if not 3306
+    port: 3306,
+  
+    // Your username
+    user: process.env.DB_USER,
+  
+    // Your password
+    password: process.env.DB_PASS, 
 
-  // Your port; if not 3306
-  port: 3306,
+    database: process.env.DB
 
-  // Your username
-  user: "root",
-
-  // Your password
-  password: "", //DO NOT GIT PUSH WITH THIS
-  database: ""
-  //create a dotenv package to hide password
-  //create new user for these??
 });
 
 connection.connect(function(err) {
