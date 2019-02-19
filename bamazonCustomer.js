@@ -1,14 +1,10 @@
-//JS for Bamazon Node/MySQL App
+//JS for Bamazon Node/MySQL Customer App
 
 
 const inquirer = require("inquirer");
 const mysql = require("mysql");
 const Table = require("cli-table");
 const colors = require("colors");
-
-//set canBuy to true as default
-let canBuy = true;
-
 
 
 //create connection to mysql database
@@ -23,7 +19,9 @@ const connection = mysql.createConnection({
 
   // Your password
   password: "", //DO NOT GIT PUSH WITH THIS
-  database: "bamazon"
+  database: ""
+  //create a dotenv package to hide password
+  //create new user for these??
 });
 
 connection.connect(function(err) {
@@ -106,13 +104,13 @@ function buyItem(itemID, qtyNeeded) {
     connection.query(query, [itemID], function(err,res) {
         if (err) throw err;
 
-                //make product name plural (or not) as needed
-                let endingString = "";
-                if (qtyNeeded > 1) {
-                    endingString = "s.";
-                } else {
-                    endingString = ".";
-                };
+        //make product name plural (or not) as needed
+        let endingString = "";
+        if (qtyNeeded > 1) {
+            endingString = "s.";
+        } else {
+            endingString = ".";
+        };
     
         //if store has sufficient quantity, fulfill the customer's order
         if (qtyNeeded <= res[0].stock_quantity) {
