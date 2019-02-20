@@ -22,6 +22,7 @@ CREATE TABLE departments (
     over_head_costs DECIMAL(10,2) NOT NULL,
     PRIMARY KEY (department_id)
     );
-    
+
+
     SELECT * FROM bamazon.products;
     SELECT * FROM bamazon.departments;

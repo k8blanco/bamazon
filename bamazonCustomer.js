@@ -45,15 +45,22 @@ function initBamazon() {
                 , 'left': '║' , 'left-mid': '╟' , 'mid': '─' , 'mid-mid': '┼'
                 , 'right': '║' , 'right-mid': '╢' , 'middle': '│' },
               
-            head: ["ID".green, "Product".green, "Dept".green, "Price".green, "Qty".green],
+            head: ["ID".green, "Product".green, "Dept".green, "Price".green, "Qty".green, "Product Sales".green],
         });
 
         //push data to table
         for (var i = 0; i < res.length; i++) {
-            table.push(
-                [res[i].item_id, res[i].product_name, res[i].department_name, res[i].price,
+            if (res[i].product_sales != null) {
+                table.push(
+                    [res[i].item_id, res[i].product_name, res[i].department_name, res[i].price,
+                    res[i].stock_quantity, res[i].product_sales]
+                );
+                } else {
+                table.push(
+                    [res[i].item_id, res[i].product_name, res[i].department_name, res[i].price,
                     res[i].stock_quantity]
-            );
+                );
+            }
         };
         
         //display table
@@ -103,7 +110,7 @@ function askCust() {
 function buyItem(itemID, qtyNeeded) {
     //once customer has placed order, check if "store" has enough of that product
     let query = ('SELECT * FROM products WHERE item_id = ?');
-    connection.query(query, [itemID], function(err,res) {
+    connection.query(query, [itemID], function(err, res) {
         if (err) throw err;
 
         //make product name plural (or not) as needed
@@ -121,18 +128,22 @@ function buyItem(itemID, qtyNeeded) {
 
             //display total so far
             console.log("\nGreat! You want " + qtyNeeded + " " + res[0].product_name + endingString + "\nYour total cost is $" + purchasePrice);
-            //ask if they want to add more to their cart??
-
+           
+        
             //update db after purchase
-            let query = ("UPDATE bamazon.products SET stock_quantity = stock_quantity - ? WHERE item_id = ?");
-            connection.query(query, [qtyNeeded, itemID]); //can add in product sales to product sales column here
+            let query = ("UPDATE products SET stock_quantity = stock_quantity - ?, product_sales = product_sales + ? WHERE item_id = ?");
+            connection.query(query, [qtyNeeded, purchasePrice, itemID], function(err, res){
+            }); 
+            
         } else {
             console.log("Out of Stock".red);
         };
-        //ask if they want to make another purchase
+
+        //make recursive/ask if they want to buy something else
         buyMore();
     }); 
 };
+
 
 
 function buyMore() {
