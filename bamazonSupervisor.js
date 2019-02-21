@@ -62,6 +62,9 @@ function initSpvMenu() {
     });
 };
 
+// total profit = product_sales - over_head_costs
+
+
 function viewSales() {
             let query = ("SELECT departments.department_id, departments.department_name, departments.over_head_costs, SUM(products.product_sales) AS product_sales FROM departments INNER JOIN products ON departments.department_name=products.department_name GROUP BY departments.department_id ORDER BY departments.department_id");
             connection.query(query, function(err, res) {
@@ -73,13 +76,17 @@ function viewSales() {
                         , 'left': '║' , 'left-mid': '╟' , 'mid': '─' , 'mid-mid': '┼'
                         , 'right': '║' , 'right-mid': '╢' , 'middle': '│' },
             
-                        head: ["Dept ID".green, "Dept".green, "Overhead Costs".green, "Sales Total".green],
+                        head: ["Dept ID".green, "Dept".green, "Overhead Costs".green, "Sales Total".green, "Total Profit".green],
             });
-         
+            
+            
             for (var i = 0; i < res.length; i++) {
+                var totalProfit = (res[i].over_head_costs - res[i].product_sales).toFixed(2);
                 table.push(
+
                     [res[i].department_id, res[i].department_name, res[i].over_head_costs, 
-                    res[i].product_sales]
+                    res[i].product_sales, totalProfit]
+
                 );
             };
 
