@@ -209,8 +209,7 @@ function addInventory() {
 
 //if a manager selects add new product, it should allow the manager to add completely new product to store
 function newProduct(){
-    //do i create a new table to join?  or just add new data????
-
+ 
     //inquirer prompt to ask what they want to add
         inquirer.prompt([
             {
@@ -256,7 +255,6 @@ function newProduct(){
     };    
 
 function addNew(itemName, itemDept, itemPrice, itemQty) {
-
     let query = ("INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES ('" + itemName + "','" + itemDept + "'," + itemPrice + ',' + itemQty + ")")
     connection.query(query, function(err, res) {
         if(err) throw err;

@@ -45,7 +45,7 @@ function initBamazon() {
                 , 'left': '║' , 'left-mid': '╟' , 'mid': '─' , 'mid-mid': '┼'
                 , 'right': '║' , 'right-mid': '╢' , 'middle': '│' },
               
-            head: ["ID".green, "Product".green, "Dept".green, "Price".green, "Qty".green, "Product Sales".green],
+            head: ["ID".green, "Product".green, "Dept".green, "Price".green, "Qty".green, "Product Sales".green], //remove product sales once supervisor works
         });
 
         //push data to table

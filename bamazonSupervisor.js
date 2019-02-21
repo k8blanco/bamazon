@@ -50,7 +50,6 @@ function initSpvMenu() {
             //----------------View Products-----------------
             case "View Product Sales by Department":
                 viewSales();
-                console.log("viewing sales");
                 break;
 
             //----------------Low Inventory-----------------
@@ -64,86 +63,114 @@ function initSpvMenu() {
 };
 
 function viewSales() {
-    
-    //total products data
-    let query = ("SELECT department_name, SUM(product_sales) AS product_sales FROM products GROUP BY department_name");
-    connection.query(query, function(err,res) {
-        if (err) throw err;
-        console.log("totalling data");
-
-    //join table data from products and departments tables
-    let query = ("SELECT products.department_name, products.product_sales FROM products INNER JOIN departments ON products.department_name=departments.department_name");
-    connection.query(query, function(err, res) {
-        if (err) throw err;
-        console.log("joining data");
-
-    //get all data from departments table
-    let query = ("SELECT * FROM departments")
-        connection.query(query, function(err, res) {
-            if (err) throw err;
-        console.log("selecting all from departments");
-
-        var table = new Table({
-            chars: { 'top': '═' , 'top-mid': '╤' , 'top-left': '╔' , 'top-right': '╗'
-                , 'bottom': '═' , 'bottom-mid': '╧' , 'bottom-left': '╚' , 'bottom-right': '╝'
-                , 'left': '║' , 'left-mid': '╟' , 'mid': '─' , 'mid-mid': '┼'
-                , 'right': '║' , 'right-mid': '╢' , 'middle': '│' },
-        });
-
-        for (var i = 0; i < res.length; i++) {
+            let query = ("SELECT departments.department_id, departments.department_name, departments.over_head_costs, SUM(products.product_sales) AS product_sales FROM departments INNER JOIN products ON departments.department_name=products.department_name GROUP BY departments.department_id ORDER BY departments.department_id");
+            connection.query(query, function(err, res) {
+                if (err) throw err;
+            
+            var table = new Table({
+                chars: { 'top': '═' , 'top-mid': '╤' , 'top-left': '╔' , 'top-right': '╗'
+                        , 'bottom': '═' , 'bottom-mid': '╧' , 'bottom-left': '╚' , 'bottom-right': '╝'
+                        , 'left': '║' , 'left-mid': '╟' , 'mid': '─' , 'mid-mid': '┼'
+                        , 'right': '║' , 'right-mid': '╢' , 'middle': '│' },
+            
+                        head: ["Dept ID".green, "Dept".green, "Overhead Costs".green, "Sales Total".green],
+            });
+         
+            for (var i = 0; i < res.length; i++) {
                 table.push(
-                    [res[i].department_id, res[i].department_name, res[i].over_head_costs, res[i].product_sales]
+                    [res[i].department_id, res[i].department_name, res[i].over_head_costs, 
+                    res[i].product_sales]
                 );
             };
 
         //display table
         console.log(table.toString());
-
+        doMore();
+        
     });
-});
-});
 };
-//     SELECT Orders.OrderID, Customers.CustomerName, Orders.OrderDate
-// FROM Orders
-// INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
 
-
-    //--------------------table to join dept name and show prodpuct sales---------------------------
-    // let query = ("SELECT department_name, SUM(product_sales) AS product_sales FROM products GROUP BY department_name");
-    // connection.query(query, function(err,res) {
-    //     if (err) throw err;
-
-    //     let tableB = new Table({
-    //         chars: { 'top': '═' , 'top-mid': '╤' , 'top-left': '╔' , 'top-right': '╗'
-    //             , 'bottom': '═' , 'bottom-mid': '╧' , 'bottom-left': '╚' , 'bottom-right': '╝'
-    //             , 'left': '║' , 'left-mid': '╟' , 'mid': '─' , 'mid-mid': '┼'
-    //             , 'right': '║' , 'right-mid': '╢' , 'middle': '│' },
-
-    //             head: ["Product Sales".green],
-    //     });
-    
-    //     //push data to table
-    //     for (var i = 0; i < res.length; i++) {
-    //         tableB.push(
-    //             [res[i].department_name, res[i].product_sales]
-    //         );
-    //     };
-
-    // //display table
-    // console.log(tableA.toString());
-    
-    // });  //make recursive
-        // doMore();
-
-        //total product sales for each department
-        //display the totals associated with each dept in this table 
-  
 
 function createDept() {
 
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "name",
+            message: "What is the name of the department you would like to add??",
+        },
+        {
+            type: "input",
+            name: "costs",
+            message: "What do you anticipate the overhead costs to be?",
+        },
+    ])
+    .then(function(add) {
+        let deptName = add.name;
+        let deptCosts = add.costs;
+        addDept(deptName, deptCosts);
+    });
+};    
+
+function addDept(deptName, deptCosts) {
+
+    let query = ("INSERT INTO departments (department_name, over_head_costs) VALUES ('" + deptName + "'," + deptCosts + ")");  
+                                                    
+    connection.query(query, function(err, res) {
+        if(err) throw err;
+        console.log("\n" + deptName + " added to Departments" + ".");
+        console.log("----------------------------------------------".magenta);
+
+        anotherDept();
+        });         
+     
+};
+
+function anotherDept() {
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "action",
+            message: "What would you like to do now?",
+            choices: ["Add Another Department", "Something Else", "Leave"]
+        }
+    ])
+    .then(function(menu) {
+        //determine which code block needs to be called
+        switch (menu.action) {
+
+            //----------------View Products-----------------
+            case "Add Another Product":
+                createDept();
+                break;
+
+            case "Something Else":
+                initSpvMenu();
+                break;
+
+            case "Leave":
+                console.log("\nGreat!  Thanks for being awesome, supervisor!".green);
+                connection.end();
+                break;
+        };
+    });
 }
 
 
 function doMore() {
+    inquirer.prompt([
+        {
+            name: "confirm",
+            type: "confirm",
+            message: "Would you like to do something else?",
+        },
+    ]).then(function(inquirerResponse) {
+        if (inquirerResponse.confirm) {
+            initSpvMenu();
+        } else {
+            console.log("\nGreat!  Keep up the good work.".green);
+            connection.end();
+        }
+    });
 
 }
