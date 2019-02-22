@@ -62,7 +62,6 @@ function initSpvMenu() {
     });
 };
 
-// total profit = product_sales - over_head_costs
 
 
 function viewSales() {
@@ -81,7 +80,8 @@ function viewSales() {
             
             
             for (var i = 0; i < res.length; i++) {
-                var totalProfit = (res[i].over_head_costs - res[i].product_sales).toFixed(2);
+                var totalProfit = (res[i].product_sales - res[i].over_head_costs).toFixed(2);
+                // var totalProfit = (res[i].over_head_costs - res[i].product_sales).toFixed(2);
                 table.push(
 
                     [res[i].department_id, res[i].department_name, res[i].over_head_costs, 
@@ -104,7 +104,7 @@ function createDept() {
         {
             type: "input",
             name: "name",
-            message: "What is the name of the department you would like to add??",
+            message: "What is the name of the department you would like to add?",
         },
         {
             type: "input",
@@ -147,7 +147,7 @@ function anotherDept() {
         switch (menu.action) {
 
             //----------------View Products-----------------
-            case "Add Another Product":
+            case "Add Another Department":
                 createDept();
                 break;
 
@@ -175,7 +175,7 @@ function doMore() {
         if (inquirerResponse.confirm) {
             initSpvMenu();
         } else {
-            console.log("\nGreat!  Keep up the good work.".green);
+            console.log("\nGreat!  Thanks for being awesome, supervisor!".green);
             connection.end();
         }
     });

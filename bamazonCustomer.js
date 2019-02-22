@@ -45,22 +45,15 @@ function initBamazon() {
                 , 'left': '║' , 'left-mid': '╟' , 'mid': '─' , 'mid-mid': '┼'
                 , 'right': '║' , 'right-mid': '╢' , 'middle': '│' },
               
-            head: ["ID".green, "Product".green, "Dept".green, "Price".green, "Qty".green, "Product Sales".green], //remove product sales once supervisor works
+            head: ["ID".green, "Product".green, "Dept".green, "Price".green, "Qty".green],
         });
 
         //push data to table
         for (var i = 0; i < res.length; i++) {
-            if (res[i].product_sales != null) {
-                table.push(
-                    [res[i].item_id, res[i].product_name, res[i].department_name, res[i].price,
-                    res[i].stock_quantity, res[i].product_sales]
-                );
-                } else {
                 table.push(
                     [res[i].item_id, res[i].product_name, res[i].department_name, res[i].price,
                     res[i].stock_quantity]
                 );
-            }
         };
         
         //display table
@@ -127,7 +120,7 @@ function buyItem(itemID, qtyNeeded) {
             let purchasePrice = res[0].price * qtyNeeded;
 
             //display total so far
-            console.log("\nGreat! You want " + qtyNeeded + " " + res[0].product_name + endingString + "\nYour total cost is $" + purchasePrice);
+            console.log("\nGreat! You want " + qtyNeeded + " " + res[0].product_name + endingString + "\nYour total cost is $" + purchasePrice.toFixed(2));
            
         
             //update db after purchase
